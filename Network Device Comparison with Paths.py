@@ -37,12 +37,11 @@ with open("current_config.txt", "w") as f:
     f.write(current_config)
 
 # Load local offline configuration for comparison
-with open("local_offline_config.txt", "r") as f:
-    local_offline_config = f.read()
+with open("/path/to/local_offline_config.txt", "r") as f:
 
-# Load Cisco device hardening advice
-with open("cisco_device_hardening_advice.txt", "r") as f:
-    cisco_device_hardening_advice = f.read()
+    # Load Cisco device hardening advice
+    with open("cisco_device_hardening_advice.txt", "r") as f:
+        cisco_device_hardening_advice = f.read()
 
 # Extract configuration commands from current running configuration and local offline configuration
 current_config_commands = extract_config_commands(current_config)
