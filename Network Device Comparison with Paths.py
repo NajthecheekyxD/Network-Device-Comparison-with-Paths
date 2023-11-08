@@ -16,13 +16,14 @@ def extract_config_commands(config):
             config_commands[match.group(1)] = match.group(2)
     return config_commands
 
-# Ask for device information
-device_ip = input("Enter device IP: ")
-device_username = input("Enter username: ")
-device_password = getpass("Enter password: ")
+try:
+    # Ask for device information
+    device_ip = input("Enter device IP: ")
+    device_username = input("Enter username: ")
+    device_password = getpass("Enter password: ")
 
-# Create SSH connection to the device
-device_connection = netmiko.ConnectHandler(
+    # Create SSH connection to the device
+    device_connection = netmiko.ConnectHandler(
     host=device_ip,
     username=device_username,
     password=device_password,
@@ -32,18 +33,31 @@ device_connection = netmiko.ConnectHandler(
 # Retrieve current running configuration from the device
 current_config = device_connection.send_command("show running-config")
 
-# Save current running configuration to a file
+# Write current running configuration to a file
 with open("current_config.txt", "w") as f:
     f.write(current_config)
 
 # Load local offline configuration for comparison
-with open("local_offline_config.txt", "r") as f:
-    local_offline_config = f.read()
+try:
+    with open("local_offline_config.txt", "r") as f:
+        local_offline_config = f.read()
+except FileNotFoundError:
+    print("Error: local_config.txt not found.")
+    exit(1)
+except PermissionError:
+    print("Error: Insufficient permissions to read local_offline_config.txt.")
 
+    exit(1)
 # Load Cisco device hardening advice
+try:
     with open("cisco_device_hardening_advice.txt", "r") as f:
         cisco_device_hardening_advice = f.read()
-
+except FileNotFoundError:
+    print("Error: cisco_device_hardening_advice.txt not found")
+    exit(1)
+except PermissionError:
+    print("Error: insufficient permission to read cisco_device_hardening_advice.txt.")
+    exit(1)
 # Extract configuration commands from current running configuration and local offline configuration
 current_config_commands = extract_config_commands(current_config)
 local_offline_config_commands = extract_config_commands(local_offline_config)
