@@ -1,7 +1,7 @@
-import netmiko
-import difflib
-from getpass import getpass
+from netmiko import connecthandler
 import re
+import getpass
+import difflib
 
 def compare_configs(config1, config2):
     differences = difflib.ndiff(config1.splitlines(keepends=True), config2.splitlines(keepends=True))
@@ -23,41 +23,23 @@ try:
     device_password = getpass("Enter password: ")
 
     # Create SSH connection to the device
-    device_connection = netmiko.ConnectHandler(
+    device_connection = connecthandler(
         host=device_ip,
         username=device_username,
         password=device_password,
-        device_type="cisco_ios"
+        device_type="cisco_ios",
     )
 
-    # Retrieve current running configuration from the device
+    # Retrieve device's running configuration
     current_config = device_connection.send_command("show running-config")
 
-    # Write current running configuration to a file
-    with open("current_config.txt", "w") as f:
-        f.write(current_config)
+    # Retrieve the local offline configuration
+    with open("local_offline_config.txt", "r") as f:
+        local_offline_config = f.read()
 
-    # Load local offline configuration for comparison
-    try:
-        with open("local_offline_config.txt", "r") as f:
-            local_offline_config = f.read()
-    except FileNotFoundError:
-        print("Error: local_config.txt not found.")
-        exit(1)
-    except PermissionError:
-        print("Error: Insufficient permissions to read local_offline_config.txt.")
-        exit(1)
-
-    # Load Cisco device hardening advice
-    try:
-        with open("cisco_device_hardening_advice.txt", "r") as f:
-            cisco_device_hardening_advice = f.read()
-    except FileNotFoundError:
-        print("Error: cisco_device_hardening_advice.txt not found.")
-        exit(1)
-    except PermissionError:
-        print("Error: Insufficient permissions to read cisco_device_hardening_advice.txt.")
-        exit(1)
+    # Retrieve the Cisco device hardening advice
+    with open("cisco_device_hardening_advice.txt", "r") as f:
+        cisco_device_hardening_advice = f.read()
 
     # Extract configuration commands from current running configuration and local offline configuration
     current_config_commands = extract_config_commands(current_config)
@@ -79,12 +61,11 @@ try:
     device_connection.send_config_set(["logging host 192.168.1.1"])
     device_connection.save_config()
 
-except netmiko.NetMikoTimeoutException:
-    print("Timeout error: could not connect to the device.")
-except netmiko.NetMikoAuthenticationException:
-    print("Authentication error: invalid username or password.")
+except FileNotFoundError:
+    print("Error: local_offline_config.txt not found.")
+except PermissionError:
+    print("Error: Insufficient permissions to read local_offline_config.txt.")
+except getpass.GetPassWarning:
+    print("Error: Invalid password.")
 except Exception as e:
-    print("Error: ", str(e))
-finally:
-    if device_connection:
-        device_connection.disconnect()
+    print(f"Error: {e}")
