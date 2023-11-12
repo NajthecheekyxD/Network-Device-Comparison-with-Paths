@@ -1,7 +1,20 @@
-from netmiko import ConnectHandler
-import getpass
-import re
+import netmiko
 import difflib
+from getpass import getpass
+import re
+
+def compare_configs(config1, config2):
+    differences = difflib.ndiff(config1.splitlines(keepends=True), config2.splitlines(keepends=True))
+    return ''.join(differences)
+
+def extract_config_commands(config):
+    config_commands = {}
+    lines = config.splitlines()
+    for line in lines:
+        match = re.match(r"^(.*?)\s{1,}(.*)$", line)
+        if match:
+            config_commands[match.group(1)] = match.group(2)
+    return config_commands
 
 try:
     # Ask for device information
@@ -10,7 +23,7 @@ try:
     device_password = getpass("Enter password: ")
 
     # Create SSH connection to the device
-    device_connection = ConnectHandler(
+    device_connection = netmiko.ConnectHandler(
         host=device_ip,
         username=device_username,
         password=device_password,
