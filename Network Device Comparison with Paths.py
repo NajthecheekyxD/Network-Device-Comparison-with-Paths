@@ -1,4 +1,4 @@
-from netmiko import connecthandler
+from netmiko import ConnectHandler
 import re
 import getpass
 import difflib
@@ -23,7 +23,7 @@ try:
     device_password = getpass("Enter password: ")
 
     # Create SSH connection to the device
-    device_connection = connecthandler(
+    device_connection = ConnectHandler(
         host=device_ip,
         username=device_username,
         password=device_password,
