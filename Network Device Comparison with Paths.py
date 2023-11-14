@@ -1,7 +1,7 @@
-import netmiko
-import difflib
-from getpass import getpass
+import getpass
 import re
+import difflib
+import netmiko
 
 def compare_configs(config1, config2):
     differences = difflib.ndiff(config1.splitlines(keepends=True), config2.splitlines(keepends=True))
@@ -41,22 +41,16 @@ try:
     try:
         with open("local_offline_config.txt", "r") as f:
             local_offline_config = f.read()
-    except FileNotFoundError:
-        print("Error: local_config.txt not found.")
-        exit(1)
-    except PermissionError:
-        print("Error: Insufficient permissions to read local_offline_config.txt.")
+    except Exception as e:
+        print("Error: Could not read local_offline_config.txt: ", str(e))
         exit(1)
 
     # Load Cisco device hardening advice
     try:
         with open("cisco_device_hardening_advice.txt", "r") as f:
             cisco_device_hardening_advice = f.read()
-    except FileNotFoundError:
-        print("Error: cisco_device_hardening_advice.txt not found.")
-        exit(1)
-    except PermissionError:
-        print("Error: Insufficient permissions to read cisco_device_hardening_advice.txt.")
+    except Exception as e:
+        print("Error: Could not read cisco_device_hardening_advice.txt: ", str(e))
         exit(1)
 
     # Extract configuration commands from current running configuration and local offline configuration
