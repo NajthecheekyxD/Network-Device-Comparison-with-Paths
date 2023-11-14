@@ -39,31 +39,36 @@ try:
     # Retrieve current running configuration from the device
     current_config = device_connection.send_command("show running-config")
 
-
     # Write current running configuration to a file
     with open("current_config.txt", "w") as f:
         f.write(current_config)
 
-  # Load Cisco device hardening advice
+    # Load Cisco device hardening advice
     try:
-        with open("cisco_device_hardening_device.txt", "r") as f:
-            cisco_device_hardening_advice = f.read()
+        with open("cisco_device_hardening_advice.txt", "r") as f:
+            cisco_device_hardening_device = f.read()
     except FileNotFoundError:
         print("Error: cisco_device_hardening_device.txt not found.")
         exit(1)
     except PermissionError:
-        print("Error: Insufficient permissions to read cisco_device_hardening_advice.txt.")
+        print("Error: Insufficient permissions to read cisco_device_hardening_device.txt.")
         exit(1)
 
-    # Extract configuration commands from current running configuration and local offline configuration
+    # Extract configuration commands from startup configuration and Cisco device hardening device
     current_config_commands = extract_config_commands(current_config)
-    cisco_device_hardening_advice_commands = extract_config_commands(cisco_device_hardening_advice)
+    cisco_device_hardening_advice_commands = extract_config_commands(cisco_device_hardening_device)
 
-    # Compare current running configuration with local offline configuration and Cisco device hardening advice
-    cisco_device_hardening_advice_differences = compare_configs(current_config, cisco_device_hardening_advice)
+    # Compare current running configuration and Cisco device hardening device
+    cisco_device_hardening_advice_differences = compare_configs(current_config, cisco_device_hardening_device)
 
     # Print the differences
+    print('-'*50)
     print("\nDifferences between the running configuration and the startup configuration:")
-   
     print("\nDifferences between the current running configuration and the Cisco device hardening advice:")
-    print("cisco_device_hardening_device_differences")
+    print('-'*50)
+    print(cisco_device_hardening_advice_differences)
+
+finally:
+    # Close SSH connection
+    if 'device_connection' in locals() or 'device_connection' in globals():
+        device_connection.disconnect()
