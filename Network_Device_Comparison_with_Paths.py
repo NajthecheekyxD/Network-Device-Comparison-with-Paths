@@ -31,7 +31,7 @@ try:
     )
     # Retrieve startup configuration from the device
     startup_config = device_connection.send_command("show startup-config")
-    
+
     # Write current running configuration to a file
     with open("startup_config.txt", "w") as f:
         f.write(startup_config)
@@ -41,11 +41,12 @@ try:
 
     # Write current running configuration to a file
     with open("current_config.txt", "w") as f:
+        device_connection.send_command("Terminal Length 0")
         f.write(current_config)
 
-    # Load Cisco device hardening advice
+    # Load Cisco device hardening device
     try:
-        with open("cisco_device_hardening_advice.txt", "r") as f:
+        with open("cisco_device_hardening_device.txt", "r") as f:
             cisco_device_hardening_device = f.read()
     except FileNotFoundError:
         print("Error: cisco_device_hardening_device.txt not found.")
@@ -56,17 +57,17 @@ try:
 
     # Extract configuration commands from startup configuration and Cisco device hardening device
     current_config_commands = extract_config_commands(current_config)
-    cisco_device_hardening_advice_commands = extract_config_commands(cisco_device_hardening_device)
+    cisco_device_hardening_device_commands = extract_config_commands(cisco_device_hardening_device)
 
     # Compare current running configuration and Cisco device hardening device
-    cisco_device_hardening_advice_differences = compare_configs(current_config, cisco_device_hardening_device)
+    cisco_device_hardening_device_differences = compare_configs(current_config, cisco_device_hardening_device)
 
     # Print the differences
     print('-'*50)
     print("\nDifferences between the running configuration and the startup configuration:")
     print("\nDifferences between the current running configuration and the Cisco device hardening advice:")
     print('-'*50)
-    print(cisco_device_hardening_advice_differences)
+    print(cisco_device_hardening_device_differences)
 
 finally:
     # Close SSH connection
