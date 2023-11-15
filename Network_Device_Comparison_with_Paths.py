@@ -18,9 +18,9 @@ def extract_config_commands(config):
 
 try:
     # Ask for device information
-    device_ip = input("Enter device IP: ")
-    device_username = input("Enter username: ")
-    device_password = getpass("Enter password: ")
+    device_ip = input("Enter device IP: ") #192.168.56.101
+    device_username = input("Enter username: ") #cisco
+    device_password = getpass("Enter password: ")#cisco123!
 
     # Create SSH connection to the device
     device_connection = netmiko.ConnectHandler(
@@ -45,22 +45,23 @@ try:
         f.write(current_config)
 
     # Load Cisco device hardening device
+    cisco_hardening_device_filename = "cisco_device_hardening_device.txt"
     try:
-        with open("cisco_device_hardening_device.txt", "r") as f:
-            cisco_device_hardening_device = f.read()
+        with open(cisco_hardening_device_filename, "r") as f:
+            cisco_hardening_device = f.read()
     except FileNotFoundError:
-        print("Error: cisco_device_hardening_device.txt not found.")
+        print(f"Error: {cisco_hardening_device_filename} not found.")
         exit(1)
     except PermissionError:
-        print("Error: Insufficient permissions to read cisco_device_hardening_device.txt.")
+        print(f"Error: Insufficient permissions to read {cisco_hardening_device_filename}.")
         exit(1)
 
     # Extract configuration commands from startup configuration and Cisco device hardening device
     current_config_commands = extract_config_commands(current_config)
-    cisco_device_hardening_device_commands = extract_config_commands(cisco_device_hardening_device)
+    cisco_hardening_device_commands = extract_config_commands(cisco_hardening_device)
 
     # Compare current running configuration and Cisco device hardening device
-    cisco_device_hardening_device_differences = compare_configs(current_config, cisco_device_hardening_device)
+    cisco_hardening_device_differences = compare_configs(current_config, cisco_hardening_device)
 
     # Print the differences
     print('-'*50)
