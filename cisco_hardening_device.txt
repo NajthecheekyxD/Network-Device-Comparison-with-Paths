@@ -1,0 +1,11 @@
+! Cisco Device Hardening Recommendations
+!
+
+enable secret <strong_secret_password>
+username admin privilege 15 secret <strong_admin_password>
+login block-for 120 attempts 3 within 60
+login delay 2
+service password-encryption
+line console 0
+  login authentication local_auth
+  transport input ssh
