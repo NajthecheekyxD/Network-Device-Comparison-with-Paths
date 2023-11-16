@@ -87,8 +87,8 @@ def compare_running_config():
             print(f"Retrying...")
             time.sleep(5)
 
-with open('running_config.txt', 'w') as f:
-    f.write(show_running_config)
+    with open('running_config.txt', 'w') as f:
+        f.write(show_running_config)
 
 def configure_syslog():
     with open('hardening_commands.txt', 'r') as f:
@@ -97,17 +97,19 @@ def configure_syslog():
             try:
                 ssh_conn = ConnectHandler(**ssh_device)
                 ssh_conn.enable()
-            for command in hardening_commands:
-                ssh_conn.send_command(command)
-        
-            ssh_conn.send_command ('write memory') #Save configuration
-            ssh_conn.disconnect()
-            break
-        except ValueError as e:
-        print(f"Error: {e}")
-        print(f"Retrying...")
-        time.sleep(5)
+                for command in hardening_commands:
+                    ssh_conn.send_command(command)
+            
+                ssh_conn.send_command ('write memory') #Save configuration
+                ssh_conn.disconnect()
+                break
+            except ValueError as e:
+                print(f"Error: {e}")
+                print(f"Retrying...")
+                time.sleep(5)
     
     print("Syslog configuration complete")
+
 if __name__ == "__main__":
     ssh_menu() # Call the ssh_menu() once
+
