@@ -103,13 +103,13 @@ def compare_with_hardening_device(show_running_config):
         exit(1)
 
     # Compare current running configuration and Cisco Hardening Device
-    diff = compare_configs(show_running_config, cisco_hardening_device)
+    diff = difflib.unified_diff(show_running_config.splitlines(),cisco_hardening_device.splitlines(), lineterm='')
 
     # Print the differences
     print('-'*50)
     print("\nDifferences between the current running configuration and the cisco hardening device")
     print('-'*50)
-    print(diff)
+    print('\n'.join(diff))
 
 def configure_syslog():
     # Open and read the syslog commands from a file
