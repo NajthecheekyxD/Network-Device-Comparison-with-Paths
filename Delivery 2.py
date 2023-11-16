@@ -27,7 +27,8 @@ def ssh_menu():
     elif choice == "2":
         save_running_config()
     elif choice == "3":
-        compare_running_config()
+        show_running_config = compare_running_config()
+        compare_with_hardening_device(show_running_config)
     elif choice == "4":
         configure_syslog()
     elif choice == "5":
@@ -90,10 +91,10 @@ def compare_running_config():
     return show_running_config
 
 def compare_with_hardening_device(show_running_config):
-  # Load Cisco Hardening device
-  try:
-      with open("cisco_hardening_device,txt", "r") as f:
-          cisco_hardening_device = f.read()
+    # Load Cisco Hardening device
+    try:
+        with open("cisco_hardening_device.txt", "r") as f:
+            cisco_hardening_device = f.read()
     except FileNotFoundError:
         print("Error: cisco_hardening_device.txt not found")
         exit(1)
@@ -101,14 +102,14 @@ def compare_with_hardening_device(show_running_config):
         print("Error: Insufficient permissions to read cisco_hardening_device.txt")
         exit(1)
 
-# Compare current running configuration and Cisco Hardening Device
-diff = compare_configs(show_running_config, cisco_hardening_device)
+    # Compare current running configuration and Cisco Hardening Device
+    diff = compare_configs(show_running_config, cisco_hardening_device)
 
-# Print the differences
-print('-'*50)
-print("\nDifferences between the current running configuration and the cisco hardening device")
-print('-'*50)
-print(diff)
+    # Print the differences
+    print('-'*50)
+    print("\nDifferences between the current running configuration and the cisco hardening device")
+    print('-'*50)
+    print(diff)
 
 def configure_syslog():
     # Open and read the syslog commands from a file
