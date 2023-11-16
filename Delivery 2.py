@@ -29,10 +29,10 @@ def ssh_menu():
         save_running_config()
     elif choice == "3":
         show_running_config = compare_running_config()
-        compare_running_with_startup_config()
+        compare_running_with_startup_config(show_running_config)
     elif choice == "4":
         show_running_config = compare_running_config()
-        compare_running_with_local_version()
+        compare_running_with_local_version(show_running_config)
     elif choice == "5":
         show_running_config = compare_running_config()
         compare_with_hardening_device(show_running_config)
@@ -97,7 +97,29 @@ def compare_running_config():
             time.sleep(5)
     return show_running_config
 
-def compare_running_with_local_version():
+def compare_running_with_startup_config(show_running_config):
+    while True:
+        try:
+            ssh_conn = ConnectHandler(**ssh_device)
+            ssh_conn.enable()
+            startup_config = ssh_conn.send_command('show startup-config')
+            ssh_conn.disconnect()
+            break
+        except ValueError as e:
+            print(f"Error: {e}")
+            print(f"Retrying...")
+            time.sleep(5)
+
+    # Compare current running configuration with startup configuration
+    diff_startup = difflib.unified_diff(show_running_config.splitlines(), startup_config.splitlines(), lineterm='')
+
+    # Print the differences
+    print('-' * 50)
+    print("\nDifferences between the current running configuration and the startup configuration")
+    print('-' * 50)
+    print('\n'.join(diff_startup))
+
+def compare_running_with_local_version(show_running_config):
     try:
         with open("local_offline_version.txt", "r") as f:
             local_offline_version = f.read()
