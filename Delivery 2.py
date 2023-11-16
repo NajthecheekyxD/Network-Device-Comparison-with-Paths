@@ -15,11 +15,13 @@ def ssh_menu():
     print("SSH Menu")
     print("1. Change Device Hostname")
     print("2. Save Running Configuration")
-    print("3. Compare Running Configuration")
-    print("4. Configure Syslog")
-    print("5. Exit")
+    print("3. Compare Running Configuration with Startup Configuration")
+    print("4. Compare Running Configuration with Local Version")
+    print("5. Compare Running Configuration with Cisco Hardening Device")
+    print("6. Configure Syslog")
+    print("7. Exiting SSH Menu")
     
-    choice = input("Enter your choice (1/2/3/4/5): ")
+    choice = input("Enter your choice (1/2/3/4/5/6/7): ")
 
     
     if choice == "1":
@@ -28,10 +30,16 @@ def ssh_menu():
         save_running_config()
     elif choice == "3":
         show_running_config = compare_running_config()
-        compare_with_hardening_device(show_running_config)
+        compare_running_with_startup_config()
     elif choice == "4":
-        configure_syslog()
+        show_running_config = compare_running_config()
+        compare_running_with_local_version()
     elif choice == "5":
+        show_running_config = compare_running_config()
+        compare_with_hardening_device(show_running_config)
+    elif choice == "6":
+        configure_syslog()
+    elif choice == "7":
         print("Exiting SSH Menu")
         return # Added to stop the ssh_menu() function from being called again
     else:
