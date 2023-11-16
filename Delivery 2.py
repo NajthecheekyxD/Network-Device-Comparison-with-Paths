@@ -84,7 +84,7 @@ def compare_running_config():
             break
         except ValueError as e:
             print(f"Error: {e}")
-            print("Retrying...")
+            print(f"Retrying...")
             time.sleep(5)
 
 with open('running_config.txt', 'w') as f:
