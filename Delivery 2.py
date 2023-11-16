@@ -89,16 +89,18 @@ def compare_running_config():
 
     with open('running_config.txt', 'w') as f:
         f.write(show_running_config)
+    print("Running Configuration saved to running_config.txt")
 
 def configure_syslog():
-    with open('hardening_commands.txt', 'r') as f:
-        hardening_commands = f.readlines()
+    # Open and read the syslog commands from a file
+    with open('syslog_commands.txt', 'r') as f:
+        syslog_commands = f.readlines()
         while True:
             try:
                 ssh_conn = ConnectHandler(**ssh_device)
                 ssh_conn.enable()
-                for command in hardening_commands:
-                    ssh_conn.send_command(command)
+                for command in syslog_commands:
+                    ssh_conn.send_command(command.strip())
             
                 ssh_conn.send_command ('write memory') #Save configuration
                 ssh_conn.disconnect()
@@ -112,4 +114,3 @@ def configure_syslog():
 
 if __name__ == "__main__":
     ssh_menu() # Call the ssh_menu() once
-
