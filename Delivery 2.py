@@ -1,5 +1,6 @@
 from netmiko import ConnectHandler
 import time
+import difflib
 
 # Define the device parameters for SSH connection
 ssh_device = {
@@ -86,10 +87,28 @@ def compare_running_config():
             print(f"Error: {e}")
             print(f"Retrying...")
             time.sleep(5)
+    return show_running_config
 
-    with open('running_config.txt', 'w') as f:
-        f.write(show_running_config)
-    print("Running Configuration saved to running_config.txt")
+def compare_with_hardening_device(show_running_config):
+  # Load Cisco Hardening device
+  try:
+      with open("cisco_hardening_device,txt", "r") as f:
+          cisco_hardening_device = f.read()
+    except FileNotFoundError:
+        print("Error: cisco_hardening_device.txt not found")
+        exit(1)
+    except PermissionError:
+        print("Error: Insufficient permissions to read cisco_hardening_device.txt")
+        exit(1)
+
+# Compare current running configuration and Cisco Hardening Device
+diff = compare_configs(show_running_config, cisco_hardening_device)
+
+# Print the differences
+print('-'*50)
+print("\nDifferences between the current running configuration and the cisco hardening device")
+print('-'*50)
+print(diff)
 
 def configure_syslog():
     # Open and read the syslog commands from a file
