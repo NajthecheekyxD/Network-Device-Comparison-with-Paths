@@ -1,0 +1,4 @@
+logging <syslog_server_ip>
+logging trap informational
+logging facility local6
+logging source-interface <interface_name>
