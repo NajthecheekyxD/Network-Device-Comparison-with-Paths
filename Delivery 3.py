@@ -2,6 +2,7 @@ from netmiko import ConnectHandler
 import time
 import difflib
 
+
 while True:
     username = input ('Enter your username: ')
     if username != 'prne':
@@ -195,7 +196,9 @@ def configure_acl():
     print("Enter ACL configuration. Type 'exit' on a new line to finish.")
     acl_commands = []
     while True:
-        command = input("ACL Command: ")
+        acl = input("R1> ")
+        acl = input("R1# ")
+        acl = input("R1(config)# ")
         if command.lower() == 'exit':
             break
         acl_commands.append(command)
@@ -225,7 +228,9 @@ def configure_ipsec():
     print("Enter IPSec configuration. Type 'exit' on a new line to finish.")
     ipsec_commands = []
     while True:
-        command = input("IPSec Command: ")
+        ipsec = input("R1> ")
+        ipsec = input("R1# ")
+        ipsec = input("R1(config)# ")
         if command.lower() == 'exit':
             break
         ipsec_commands.append(command)
