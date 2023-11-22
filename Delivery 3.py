@@ -182,16 +182,22 @@ def configure_syslog():
     print("Syslog configuration complete")
 
 def configure_acl():
-    acl_commands = [
-        'access-list 101 permit tcp any host 192.168.1.1 eq www',
-        'access-list 101 deny ip any any'
-    ]
+    print("Enter ACL configuration. Type 'exit' on a new line to finish.")
+    acl_commands = []
+    while True:
+        command = input("ACL Command: ")
+        if command.lower() == 'exit':
+            break
+        acl_commands.append(command)
+
+    ssh_conn = None
 
     try:
         ssh_conn = ConnectHandler(**ssh_device)
         ssh_conn.enable()
 
         ssh_conn.config_mode()
+
         for command in acl_commands:
             ssh_conn.send_command(command)
 
@@ -202,28 +208,26 @@ def configure_acl():
     except ValueError as e:
         print(f"Error configuring ACL: {e}")
     finally:
-        ssh_conn.disconnect()
+        if ssh_conn:
+            ssh_conn.disconnect()
 
 def configure_ipsec():
-    ipsec_commands = [
-        'crypto isakmp policy 10',
-        'authentication pre-share',
-        'encryption aes',
-        'hash sha',
-        'group 5',
-        'crypto isakmp key YOUR_SHARED_KEY address 0.0.0.0',
-        'crypto ipsec transform-set MY_TRANSFORM esp-aes esp-sha-hmac',
-        'crypto map MY_MAP 10 ipsec-isakmp',
-        'set peer 192.168.1.2',  # Replace with your peer's IP address
-        'set transform-set MY_TRANSFORM',
-        'match address 101'
-    ]
+    print("Enter IPSec configuration. Type 'exit' on a new line to finish.")
+    ipsec_commands = []
+    while True:
+        command = input("IPSec Command: ")
+        if command.lower() == 'exit':
+            break
+        ipsec_commands.append(command)
+
+    ssh_conn = None
 
     try:
         ssh_conn = ConnectHandler(**ssh_device)
         ssh_conn.enable()
 
         ssh_conn.config_mode()
+
         for command in ipsec_commands:
             ssh_conn.send_command(command)
 
@@ -234,7 +238,8 @@ def configure_ipsec():
     except ValueError as e:
         print(f"Error configuring IPSec: {e}")
     finally:
-        ssh_conn.disconnect()
+        if ssh_conn:
+            ssh_conn.disconnect()
 
 if __name__ == "__main__":
     ssh_menu()  # Call the ssh_menu() once
