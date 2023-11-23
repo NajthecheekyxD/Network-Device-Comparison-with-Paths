@@ -204,18 +204,24 @@ def configure_syslog():
     print("Syslog configuration complete")
 
 def configure_acl():
-    print("Enter ACL configuration. Type 'exit' on a new line to finish.")
-    acl_commands = [] #ACL Commands: ['access-list 101 deny tcp any any eq 23'], ['access-list 101 permit ip any any']
+    print("Enter ACL configuration. Type 'exit' to finish.")
+    acl_commands = [] # ACL Commands: ['access-list 101 deny tcp any any eq 23'], ['access-list 101 permit ip any any']
+
+    # Establish SSH connection
+    ssh_conn = None
+
     try:
+        ssh_conn = ConnectHandler(**ssh_device)
         ssh_conn.enable()
 
-        #Apply user-entered ACL configuration commands
+        # Apply user-entered ACL configuration commands
         while True:
             acl_command = input(f"{ssh_conn.find_prompt()}")
             if acl_command.lower() == 'exit':
                 break
             acl_commands.append(acl_command)
-        #Enter configuration mode
+
+        # Enter configuration mode
         ssh_conn.config_mode()
 
         for acl_command in acl_commands:
@@ -229,9 +235,8 @@ def configure_acl():
     except ValueError as e:
         print(f"Error configuring ACL: {e}")
     finally:
-        ssh_conn.disconnect()
-        
-       
+        if ssh_conn:
+            ssh_conn.disconnect()
 
 def configure_ipsec():
     print("Enter IPSec configuration. Type 'exit' on a new line to finish.")
