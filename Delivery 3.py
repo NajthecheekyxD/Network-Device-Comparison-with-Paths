@@ -2,17 +2,6 @@ from netmiko import ConnectHandler
 import time
 import difflib
 
-
-while True:
-    username = input ('Enter your username: ')
-    if username != 'prne':
-        print("Username is invalid")
-    username = input ('Enter your username: ')
-    password = input ('Enter your password: ')
-    if password != 'cisco123!':
-        print("Password is invalid")
-    username = input ('Enter your password: ')
-
 # Define the device parameters for SSH connection
 ssh_device = {
     'device_type': 'cisco_ios',
@@ -22,7 +11,21 @@ ssh_device = {
     'secret': 'class123!',  # Enable secret password
 }
 
+def login_to_device():
+    while True:
+        try:
+            ssh_conn = ConnectHandler(**ssh_device)
+            ssh_conn.enable()
+            return ssh_conn
+        except ValueError as e:
+            print(f"Error: {e}")
+            print("Retrying...")
+            time.sleep(5)
+
 def ssh_menu():
+    #Establish the connection once at the begining
+    ssh_conn = login_to_device()
+    
     print("SSH Menu")
     print("1. Change Device Hostname")
     print("2. Save Running Configuration")
