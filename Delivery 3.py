@@ -1,17 +1,25 @@
 from netmiko import ConnectHandler
 import time
 import difflib
+import getpass
 
 # Define the device parameters for SSH connection
 ssh_device = {
     'device_type': 'cisco_ios',
     'ip': '192.168.56.101',
-    'username': 'prne',
-    'password': 'cisco123!',
-    'secret': 'class123!',  # Enable secret password
 }
 
 def login_to_device():
+# Get username, password, and enable secret from the user
+    username = input("Enter your username: ") #prne
+    password = getpass.getpass("Enter your password: ") #cisco123!
+    secret = getpass.getpass("Enter your enable secret: ") #class123!
+
+    # Add the entered credentials to the device dictionary
+    ssh_device['username'] = username
+    ssh_device['password'] = password
+    ssh_device['secret'] = secret
+
     while True:
         try:
             ssh_conn = ConnectHandler(**ssh_device)
@@ -60,7 +68,7 @@ def ssh_menu():
         configure_ipsec()
     elif choice == "9":
         print("Exiting SSH Menu")
-        return
+        ssh_conn.disconnect()
     else:
         print("Invalid choice. Please enter 1, 2, 3, 4, 5, 6, 7, 8, or 9.")
         ssh_menu()
