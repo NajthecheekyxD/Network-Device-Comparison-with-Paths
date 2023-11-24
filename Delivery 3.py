@@ -215,22 +215,21 @@ def configure_acl():
         # Manually enter enable mode
         enable_command = input("R1>")
         if enable_command.lower() == 'enable':
-            ssh_conn.send_command_timing('enable')
-            # Modify the prompt to reflect '#' for enable mode
-            ssh_conn.set_base_prompt(prompt="#")
+        ssh_conn.send_command_timing('enable')
+        # Modify the prompt to reflect '#' for enable mode
+        ssh_conn.set_base_prompt(prompt="#")
+    else:
+        print("Invalid command. Exiting ACL configuration.")
+        return
 
-        else:
-            print("Invalid command. Exiting ACL configuration.")
-            return
-
-        # Manually enter configuration terminal mode
+    # Manually enter configuration terminal mode
         config_command = input("R1# configure terminal")
         if config_command.lower() == 'configure terminal':
-            ssh_conn.send_command_timing(config_command)
-        else:
-            print("Invalid command. Exiting ACL configuration.")
-            return
-
+        ssh_conn.send_command_timing(config_command)
+    else:
+        print("Invalid command. Exiting ACL configuration.")
+        return
+    
         prompt = ssh_conn.find_prompt()
 
         # Apply user-entered ACL configuration commands
