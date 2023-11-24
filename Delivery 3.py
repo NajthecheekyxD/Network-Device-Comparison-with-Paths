@@ -235,7 +235,7 @@ def configure_acl(ssh_conn):
 
             # Check if 'interface' command is entered
             if acl_command.strip().lower().startswith('interface'):
-                prompt = ssh_conn.find_prompt()
+                prompt = "R1(config-if)#"
 
         # Join ACL commands into a single string
         acl_config = "\n".join(acl_commands)
