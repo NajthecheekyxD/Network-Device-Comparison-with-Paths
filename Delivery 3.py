@@ -217,15 +217,21 @@ def configure_acl():
         # Enter configuration terminal mode
         ssh_conn.send_command('configure terminal')
 
-        # Apply user-entered ACL configuration commands
         while True:
-            acl_command = input(f"{ssh_conn.find_prompt()} (config)# ")
+            # Determine the current prompt
+            prompt = ssh_conn.find_prompt()
+            if "(config)" not in prompt:
+                break  # Exit if not in configuration mode
+            acl_command = input(f"{prompt} ")
             if acl_command.lower() == 'exit':
                 break
             acl_commands.append(acl_command)
 
         for acl_command in acl_commands:
             ssh_conn.send_command(acl_command)
+
+        # Exit configuration mode
+        ssh_conn.send_command('exit')
 
         # Save the configuration
         ssh_conn.send_command('write memory')
