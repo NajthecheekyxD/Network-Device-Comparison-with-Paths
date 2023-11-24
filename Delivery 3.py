@@ -7,6 +7,7 @@ import getpass
 ssh_device = {
     'device_type': 'cisco_ios',
     'ip': '192.168.56.101',
+    'timeout': 30,
 }
 
 def login_to_device():
