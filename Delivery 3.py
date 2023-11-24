@@ -216,9 +216,9 @@ def configure_acl(ssh_conn):
             return
 
         # Manually enter configuration terminal mode
-        config_command = input("R1# configure terminal")
+        config_command = input("R1#")
         if config_command.lower() == 'configure terminal':
-            ssh_conn.send_command_timing(config_command)
+            ssh_conn.send_command_timing('configure terminal')
         else:
             print("Invalid command. Exiting ACL configuration.")
             return
@@ -228,14 +228,14 @@ def configure_acl(ssh_conn):
         # Apply user-entered ACL configuration commands
         acl_commands = []
         while True:
-            acl_command = input(f"{prompt} (config)# ")
+            acl_command = input(f"{prompt}")
             if acl_command.lower() == 'exit':
                 break
             acl_commands.append(acl_command)
 
             # Check if 'interface' command is entered
             if acl_command.strip().lower().startswith('interface'):
-                prompt = ssh_conn.find_prompt(config_mode=True)
+                prompt = ssh_conn.find_prompt()
 
         # Join ACL commands into a single string
         acl_config = "\n".join(acl_commands)
