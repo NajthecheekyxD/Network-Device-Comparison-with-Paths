@@ -204,7 +204,7 @@ def configure_syslog():
     print("Syslog configuration complete")
 
 def configure_acl():
-    print("Enter ACL configuration. Type 'exit' to finish.")
+    print("Enter ACL Configuration. Type 'exit' to finish.")
 
     # Establish SSH connection
     ssh_conn = None
@@ -213,16 +213,28 @@ def configure_acl():
         ssh_conn = ConnectHandler(**ssh_device)
 
         # Manually enter enable mode
-        ssh_conn.send_command_timing('enable')
+        enable_command = input("Enter 'enable' to access privileged mode: ")
+        if enable_command.lower() == 'enable':
+            ssh_conn.send_command('enable')
+            ssh_conn.send_command_timing(getpass.getpass("Enter your enable secret password: "))
+        else:
+            print("Invalid command. Exiting ACL configuration.")
+            return
 
-        # Manually enter configuration mode
-        ssh_conn.send_command_timing('configure terminal')
+        # Manually enter configuration terminal mode
+        config_command = input("Enter 'configure terminal' to enter configuration mode: ")
+        if config_command.lower() == 'configure terminal':
+            ssh_conn.send_command_timing('configure terminal')
+        else:
+            print("Invalid command. Exiting ACL configuration.")
+            return
+
         prompt = ssh_conn.find_prompt()
 
         # Apply user-entered ACL configuration commands
         acl_commands = []
         while True:
-            acl_command = input(f"{prompt} ")
+            acl_command = input(f"{prompt} (config)# ")
             if acl_command.lower() == 'exit':
                 break
             acl_commands.append(acl_command)
