@@ -34,7 +34,7 @@ def ssh_menu():
     #Establish the connection once at the begining
     ssh_conn = login_to_device()
     
-    print("SSH Menu")
+    print("------------------SSH Menu-------------------")
     print("1. Change Device Hostname")
     print("2. Save Running Configuration")
     print("3. Compare Running Configuration with Startup Configuration")
