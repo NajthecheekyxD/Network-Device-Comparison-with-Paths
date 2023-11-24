@@ -224,28 +224,25 @@ def configure_acl(ssh_conn):
             print("Invalid command. Exiting ACL configuration.")
             return
 
-        prompt = ssh_conn.find_prompt()
-
         # Apply user-entered ACL configuration commands
         acl_commands = []
         while True:
-            acl_command = input(f"{prompt} (config)# ")
+            acl_command = input(f"{ssh_conn.find_prompt()} (config)# ")
             if acl_command.lower() == 'exit':
                 break
             acl_commands.append(acl_command)
 
-        for acl_command in acl_commands:
-            output = ssh_conn.send_command_timing(acl_command)
-            print(output)
+        # Use send_config_set to send the list of ACL commands
+        output = ssh_conn.send_config_set(acl_commands)
 
         # Save the configuration
-        output = ssh_conn.send_command_timing('write memory')
+        output += ssh_conn.send_command_timing('write memory')
         print(output)
 
         print("ACL configuration complete")
     except ValueError as e:
         print(f"Error configuring ACL: {e}")
-
+        
 def configure_ipsec():
     print("Enter IPSec configuration. Type 'exit' on a new line to finish.")
     ipsec_commands = []
