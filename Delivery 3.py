@@ -210,8 +210,6 @@ def configure_acl(ssh_conn):
         enable_command = input("R1>")
         if enable_command.lower() == 'enable':
             ssh_conn.send_command_timing('enable')
-            # Modify the prompt to reflect '#' for enable mode
-            ssh_conn.set_base_prompt(prompt="#")
         else:
             print("Invalid command. Exiting ACL configuration.")
             return
@@ -227,13 +225,16 @@ def configure_acl(ssh_conn):
         # Apply user-entered ACL configuration commands
         acl_commands = []
         while True:
-            acl_command = input(f"{ssh_conn.find_prompt()} (config)# ")
+            acl_command = input(f"R1(config)# ")
             if acl_command.lower() == 'exit':
                 break
             acl_commands.append(acl_command)
 
-        # Use send_config_set to send the list of ACL commands
-        output = ssh_conn.send_config_set(acl_commands)
+        # Join ACL commands into a single string
+        acl_config = "\n".join(acl_commands)
+
+        # Use send_config_set to send the ACL configuration
+        output = ssh_conn.send_config_set([acl_config])
 
         # Save the configuration
         output += ssh_conn.send_command_timing('write memory')
