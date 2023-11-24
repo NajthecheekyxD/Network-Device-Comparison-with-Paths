@@ -10,10 +10,10 @@ ssh_device = {
 }
 
 def login_to_device():
-# Get username, password, and enable secret from the user
-    username = input("Enter your username: ") #prne
-    password = getpass.getpass("Enter your password: ") #cisco123!
-    secret = getpass.getpass("Enter your enable secret: ") #class123!
+    # Get username, password, and enable secret from the user
+    username = input("Enter your username: ")  # prne
+    password = getpass.getpass("Enter your password: ")  # cisco123!
+    secret = getpass.getpass("Enter your enable secret: ")  # class123!
 
     # Add the entered credentials to the device dictionary
     ssh_device['username'] = username
@@ -31,9 +31,9 @@ def login_to_device():
             time.sleep(5)
 
 def ssh_menu():
-    #Establish the connection once at the begining
+    # Establish the connection once at the beginning
     ssh_conn = login_to_device()
-    
+
     print("------------------SSH Menu-------------------")
     print("1. Change Device Hostname")
     print("2. Save Running Configuration")
@@ -63,7 +63,7 @@ def ssh_menu():
     elif choice == "6":
         configure_syslog()
     elif choice == "7":
-        configure_acl()
+        configure_acl(ssh_conn)
     elif choice == "8":
         configure_ipsec()
     elif choice == "9":
@@ -203,33 +203,27 @@ def configure_syslog():
 
     print("Syslog configuration complete")
 
-def configure_acl():
+def configure_acl(ssh_conn):
     print("Enter ACL Configuration. Type 'exit' to finish.")
-
-    # Establish SSH connection
-    ssh_conn = None
-
     try:
-        ssh_conn = ConnectHandler(**ssh_device)
-
         # Manually enter enable mode
         enable_command = input("R1>")
         if enable_command.lower() == 'enable':
-        ssh_conn.send_command_timing('enable')
-        # Modify the prompt to reflect '#' for enable mode
-        ssh_conn.set_base_prompt(prompt="#")
-    else:
-        print("Invalid command. Exiting ACL configuration.")
-        return
+            ssh_conn.send_command_timing('enable')
+            # Modify the prompt to reflect '#' for enable mode
+            ssh_conn.set_base_prompt(prompt="#")
+        else:
+            print("Invalid command. Exiting ACL configuration.")
+            return
 
-    # Manually enter configuration terminal mode
+        # Manually enter configuration terminal mode
         config_command = input("R1# configure terminal")
         if config_command.lower() == 'configure terminal':
-        ssh_conn.send_command_timing(config_command)
-    else:
-        print("Invalid command. Exiting ACL configuration.")
-        return
-    
+            ssh_conn.send_command_timing(config_command)
+        else:
+            print("Invalid command. Exiting ACL configuration.")
+            return
+
         prompt = ssh_conn.find_prompt()
 
         # Apply user-entered ACL configuration commands
@@ -251,9 +245,6 @@ def configure_acl():
         print("ACL configuration complete")
     except ValueError as e:
         print(f"Error configuring ACL: {e}")
-    finally:
-        if ssh_conn:
-            ssh_conn.disconnect()
 
 def configure_ipsec():
     print("Enter IPSec configuration. Type 'exit' on a new line to finish.")
