@@ -213,16 +213,15 @@ def configure_acl():
         ssh_conn = ConnectHandler(**ssh_device)
 
         # Manually enter enable mode
-        enable_command = input("Enter 'enable' to access privileged mode: ")
+        enable_command = input("R1>")
         if enable_command.lower() == 'enable':
             ssh_conn.send_command('enable')
-            ssh_conn.send_command_timing(getpass.getpass("Enter your enable secret password: "))
         else:
             print("Invalid command. Exiting ACL configuration.")
             return
 
         # Manually enter configuration terminal mode
-        config_command = input("Enter 'configure terminal' to enter configuration mode: ")
+        config_command = input("R1#")
         if config_command.lower() == 'configure terminal':
             ssh_conn.send_command_timing('configure terminal')
         else:
@@ -234,7 +233,7 @@ def configure_acl():
         # Apply user-entered ACL configuration commands
         acl_commands = []
         while True:
-            acl_command = input(f"{prompt} (config)# ")
+            acl_command = input(f"{prompt}")
             if acl_command.lower() == 'exit':
                 break
             acl_commands.append(acl_command)
