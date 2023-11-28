@@ -207,18 +207,24 @@ def configure_syslog():
 def configure_acl(ssh_conn):
     print("Enter ACL Configuration. Type 'exit' to finish.")
     try:
+        # Define command shortcuts
+        command_shortcuts = {
+            'enable': 'en',
+            'configure terminal': ['configure terminal', 'conf t', 'config t'],
+        }
+
         # Manually enter enable mode
         enable_command = input("R1>")
-        if enable_command.lower() == 'enable':
+        if enable_command.lower() in command_shortcuts.get('enable', []):
             ssh_conn.send_command_timing('enable')
         else:
             print("Invalid command. Exiting ACL configuration.")
             return
 
         # Manually enter configuration terminal mode
-        config_command = input("R1#")
-        if config_command.lower() == 'configure terminal':
-            ssh_conn.send_command_timing('configure terminal')
+        config_command = input("R1# configure terminal")
+        if config_command.lower() in command_shortcuts.get('configure terminal', []):
+            ssh_conn.send_command_timing(config_command)
         else:
             print("Invalid command. Exiting ACL configuration.")
             return
@@ -228,13 +234,15 @@ def configure_acl(ssh_conn):
         # Apply user-entered ACL configuration commands
         acl_commands = []
         while True:
-            acl_command = input(f"{prompt}")
+            acl_command = input(f"{prompt} ")
             if acl_command.lower() == 'exit':
                 break
+
             acl_commands.append(acl_command)
 
             # Check if 'interface' command is entered
             if acl_command.strip().lower().startswith('interface'):
+                # Manually set the prompt for config-if mode
                 prompt = "R1(config-if)#"
 
         # Join ACL commands into a single string
