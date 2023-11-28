@@ -281,7 +281,7 @@ def configure_ipsec(ssh_conn):
         # Apply user-entered IPSec configuration commands
         ipsec_commands = []
         while True:
-            ipsec_command = input(f"R1(config)# ")
+            ipsec_command = input(f"R1(config)#")
             if ipsec_command.lower() == 'exit':
                 break
             ipsec_commands.append(ipsec_command)
