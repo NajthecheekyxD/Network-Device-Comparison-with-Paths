@@ -66,7 +66,7 @@ def ssh_menu():
     elif choice == "7":
         configure_acl(ssh_conn)
     elif choice == "8":
-        configure_ipsec()
+        configure_ipsec(ssh_conn)
     elif choice == "9":
         print("Exiting SSH Menu")
         ssh_conn.disconnect()
