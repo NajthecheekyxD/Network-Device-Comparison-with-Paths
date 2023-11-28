@@ -222,7 +222,7 @@ def configure_acl(ssh_conn):
             return
 
         # Manually enter configuration terminal mode
-        config_command = input("R1# configure terminal")
+        config_command = input("R1#")
         if config_command.lower() in command_shortcuts.get('configure terminal', []):
             ssh_conn.send_command_timing(config_command)
         else:
@@ -234,7 +234,7 @@ def configure_acl(ssh_conn):
         # Apply user-entered ACL configuration commands
         acl_commands = []
         while True:
-            acl_command = input(f"{prompt} ")
+            acl_command = input(f"{prompt}")
             if acl_command.lower() == 'exit':
                 break
 
