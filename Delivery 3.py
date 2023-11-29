@@ -62,7 +62,7 @@ def ssh_menu():
         show_running_config = compare_running_config()
         compare_with_hardening_device(show_running_config)
     elif choice == "6":
-        configure_syslog()
+        configure_syslog(ssh_conn)
     elif choice == "7":
         configure_acl(ssh_conn)
     elif choice == "8":
@@ -184,25 +184,54 @@ def compare_with_hardening_device(show_running_config):
     print('-' * 50)
     print('\n'.join(diff))
 
-def configure_syslog():
-    with open('syslog_commands.txt', 'r') as f:
-        syslog_commands = f.readlines()
-        while True:
-            try:
-                ssh_conn = ConnectHandler(**ssh_device)
-                ssh_conn.enable()
-                for command in syslog_commands:
-                    ssh_conn.send_command(command.strip())
+def configure_syslog(ssh_conn):
+    print("Enter Syslog Configuration. Type 'exit' to finish.")
+    try:
+        # Define command shortcuts
+        command_shortcuts = {
+            'enable': 'en',
+            'configure_terminal': ['configure terminal', 'conf t', 'config t'],
+            'exit_config': ['exit', 'end'],
+        }
 
-                ssh_conn.send_command('write memory')
-                ssh_conn.disconnect()
-                break
-            except ValueError as e:
-                print(f"Error: {e}")
-                print(f"Retrying...")
-                time.sleep(5)
+        # Manually enter enable mode
+        enable_command = input("R1>")
+        if enable_command.lower() in command_shortcuts.get('enable', []):
+            ssh_conn.send_command_timing('enable')
+        else:
+            print("Invalid command. Exiting Syslog configuration.")
+            return
 
-    print("Syslog configuration complete")
+        # Manually enter configuration terminal mode
+        config_command = input("R1#")
+        if config_command.lower() in command_shortcuts.get('configure_terminal', []):
+            ssh_conn.send_command_timing(config_command)
+        else:
+            print("Invalid command. Exiting Syslog configuration.")
+            return
+
+        prompt = ssh_conn.find_prompt()
+
+        # Syslog commands
+        syslog_commands = [
+            "logging buffered 8192",  # Example syslog command
+            "logging host 192.168.1.1",  # Example syslog host configuration
+        ]
+
+        # Apply predefined Syslog configuration commands
+        for syslog_command in syslog_commands:
+            ssh_conn.send_config_set([syslog_command])
+
+        # Use send_config_set to send the Syslog configuration
+        output = ssh_conn.send_config_set(command_shortcuts['exit_config'])
+
+        # Save the configuration
+        output += ssh_conn.send_command_timing('write memory')
+        print(output)
+
+        print("Syslog configuration complete")
+    except ValueError as e:
+        print(f"Error configuring Syslog: {e}")
 
 def configure_acl(ssh_conn):
     print("Enter ACL Configuration. Type 'exit' to finish.")
