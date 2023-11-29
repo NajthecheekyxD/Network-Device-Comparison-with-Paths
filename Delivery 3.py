@@ -284,19 +284,21 @@ def configure_ipsec(ssh_conn):
 
         prompt = ssh_conn.find_prompt()
 
-        # Apply user-entered IPSec configuration commands
-        ipsec_commands = []
-        while True:
-            ipsec_command = input(f"{prompt} ")
-            if ipsec_command.lower() in command_shortcuts.get('exit_config', []):
-                break
-            ipsec_commands.append(ipsec_command)
+        # Define a list of IPSec commands
+        ipsec_commands = [
+            'crypto isakmp policy 10',
+            'hash sha',
+            'authentication pre-share',
+            'group 24',
+            'lifetime 3600',
+            'encryption aes 256',
+            'exit',
+        ]
 
-        # Join IPSec commands into a single string
-        ipsec_config = "\n".join(ipsec_commands)
-
-        # Use send_config_set to send the IPSec configuration
-        output = ssh_conn.send_config_set([ipsec_config])
+        # Apply predefined IPSec configuration commands
+        for ipsec_command in ipsec_commands:
+            output = ssh_conn.send_command_timing(ipsec_command)
+            print(output)
 
         # Save the configuration
         output += ssh_conn.send_command_timing('write memory')
