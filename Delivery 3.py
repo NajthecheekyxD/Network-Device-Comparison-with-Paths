@@ -255,20 +255,12 @@ def configure_acl(ssh_conn):
     except ValueError as e:
         print(f"Error configuring ACL: {e}")
 
-
 def configure_ipsec(ssh_conn):
     print("Enter IPSec Configuration. Type 'exit' to finish.")
     try:
-        # Define command shortcuts
-        command_shortcuts = {
-            'enable': 'en',
-            'configure terminal': ['configure terminal', 'conf t', 'config t'],
-            'exit_config': ['exit', 'end'],
-        }
-
         # Manually enter enable mode
         enable_command = input("R1>")
-        if enable_command.lower() in command_shortcuts.get('enable', []):
+        if enable_command.lower() in ['enable', 'en']:
             ssh_conn.send_command_timing('enable')
         else:
             print("Invalid command. Exiting IPSec configuration.")
@@ -276,7 +268,7 @@ def configure_ipsec(ssh_conn):
 
         # Manually enter configuration terminal mode
         config_command = input("R1#")
-        if config_command.lower() in command_shortcuts.get('configure terminal', []):
+        if config_command.lower() in ['configure terminal', 'conf t', 'config t']:
             ssh_conn.send_command_timing(config_command)
         else:
             print("Invalid command. Exiting IPSec configuration.")
@@ -285,8 +277,6 @@ def configure_ipsec(ssh_conn):
         # Ensure that we are in global configuration mode
         if not ssh_conn.check_config_mode():
             ssh_conn.config_mode()
-
-        prompt = ssh_conn.find_prompt()
 
         # Define a list of IPSec commands
         ipsec_commands = [
@@ -299,10 +289,8 @@ def configure_ipsec(ssh_conn):
             'exit',
         ]
 
-        # Apply predefined IPSec configuration commands
-        for ipsec_command in ipsec_commands:
-            output = ssh_conn.send_command_timing(ipsec_command)
-            print(output)
+        # Use send_config_set to send the IPSec configuration
+        output = ssh_conn.send_config_set(ipsec_commands)
 
         # Save the configuration
         output += ssh_conn.send_command_timing('write memory')
@@ -311,6 +299,7 @@ def configure_ipsec(ssh_conn):
         print("IPSec configuration complete")
     except ValueError as e:
         print(f"Error configuring IPSec: {e}")
+
 
 
 if __name__ == "__main__":
