@@ -282,6 +282,10 @@ def configure_ipsec(ssh_conn):
             print("Invalid command. Exiting IPSec configuration.")
             return
 
+        # Ensure that we are in global configuration mode
+        if not ssh_conn.check_config_mode():
+            ssh_conn.config_mode()
+
         prompt = ssh_conn.find_prompt()
 
         # Define a list of IPSec commands
@@ -307,6 +311,7 @@ def configure_ipsec(ssh_conn):
         print("IPSec configuration complete")
     except ValueError as e:
         print(f"Error configuring IPSec: {e}")
+
 
 if __name__ == "__main__":
     ssh_menu()  # Call the ssh_menu() once
