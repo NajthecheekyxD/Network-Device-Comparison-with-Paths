@@ -262,12 +262,7 @@ def configure_ipsec(ssh_conn):
         command_shortcuts = {
             'enable': 'en',
             'configure terminal': ['configure terminal', 'conf t', 'config t'],
-            'crypto isakmp policy': ['crypto isakmp policy', 'crypto isakmp pol'],
-            'hash': 'hash sha',
-            'authentication': 'authentication pre-share',
-            'group': 'group 24',
-            'lifetime': 'lifetime 3600',
-            'encryption': 'encryption aes 256',
+            'exit_config': ['exit', 'end'],
         }
 
         # Manually enter enable mode
@@ -286,13 +281,23 @@ def configure_ipsec(ssh_conn):
             print("Invalid command. Exiting IPSec configuration.")
             return
 
-        # Apply user-entered IPSec configuration commands
-        ipsec_commands = []
-        while True:
-            ipsec_command = input(f"{config_command}")
-            if ipsec_command.lower() == 'exit':
-                break
+        prompt = ssh_conn.find_prompt()
 
+        # Apply user-entered IPSec configuration commands
+        ipsec_commands = [
+            'crypto isakmp policy 10',
+            'hash sha',
+            'authentication pre-share',
+            'group 24',
+            'lifetime 3600',
+            'encryption aes 256',
+            'exit',
+        ]
+
+        while True:
+            ipsec_command = input(f"{prompt} ")
+            if ipsec_command.lower() in command_shortcuts.get('exit_config', []):
+                break
             ipsec_commands.append(ipsec_command)
 
         # Join IPSec commands into a single string
@@ -308,21 +313,6 @@ def configure_ipsec(ssh_conn):
         print("IPSec configuration complete")
     except ValueError as e:
         print(f"Error configuring IPSec: {e}")
-
-# Add 'crypto isakmp policy' to the list of IPSec commands
-ipsec_commands = [
-    'crypto isakmp policy 10',
-    'hash sha',
-    'authentication pre-share',
-    'group 24',
-    'lifetime 3600',
-    'encryption aes 256',
-]
-
-# Display the IPSec commands
-for command in ipsec_commands:
-    print(command)
-
 
 if __name__ == "__main__":
     ssh_menu()  # Call the ssh_menu() once
