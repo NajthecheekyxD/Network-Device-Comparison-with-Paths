@@ -232,15 +232,15 @@ def configure_acl(ssh_conn):
             return
 
         # Apply user-entered ACL configuration commands
-        acl_name = input("Enter ACL name: ")
-        acl_commands = [
-            f"ip access-list extended {acl_name}",
-        ]
-        
+        acl_commands = []
         while True:
-            acl_command = input(f"R1(config-ext-nacl)# ")
+            acl_command = input(f"R1(config)# ")
             if acl_command.lower() == 'exit':
                 break
+
+            if acl_command.lower().startswith('interface'):
+                print("Invalid command. Exiting ACL configuration.")
+                return
 
             acl_commands.append(acl_command)
 
