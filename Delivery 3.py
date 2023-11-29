@@ -259,9 +259,16 @@ def configure_acl(ssh_conn):
 def configure_ipsec(ssh_conn):
     print("Enter IPSec Configuration. Type 'exit' to finish.")
     try:
+        # Define command shortcuts
+        command_shortcuts = {
+            'enable': 'en',
+            'configure terminal': ['configure terminal', 'conf t', 'config t'],
+            'exit_config': ['exit', 'end'],
+        }
+
         # Manually enter enable mode
         enable_command = input("R1>")
-        if enable_command.lower() in ['enable', 'en']:
+        if enable_command.lower() in command_shortcuts.get('enable', []):
             ssh_conn.send_command_timing('enable')
         else:
             print("Invalid command. Exiting IPSec configuration.")
@@ -269,17 +276,19 @@ def configure_ipsec(ssh_conn):
 
         # Manually enter configuration terminal mode
         config_command = input("R1#")
-        if config_command.lower() in ['configure terminal', 'conf t', 'config t']:
+        if config_command.lower() in command_shortcuts.get('configure terminal', []):
             ssh_conn.send_command_timing(config_command)
         else:
             print("Invalid command. Exiting IPSec configuration.")
             return
 
+        prompt = ssh_conn.find_prompt()
+
         # Apply user-entered IPSec configuration commands
         ipsec_commands = []
         while True:
-            ipsec_command = input(f"CSR1KV(config)# ")
-            if ipsec_command.lower() == 'exit':
+            ipsec_command = input(f"{prompt} ")
+            if ipsec_command.lower() in command_shortcuts.get('exit_config', []):
                 break
             ipsec_commands.append(ipsec_command)
 
@@ -290,7 +299,6 @@ def configure_ipsec(ssh_conn):
         output = ssh_conn.send_config_set([ipsec_config])
 
         # Save the configuration
-        output += ssh_conn.send_command_timing('end')
         output += ssh_conn.send_command_timing('write memory')
         print(output)
 
