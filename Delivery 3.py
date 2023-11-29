@@ -278,7 +278,7 @@ def configure_ipsec(ssh_conn):
         # Apply user-entered IPSec configuration commands
         ipsec_commands = []
         while True:
-            ipsec_command = input(f"R1(config)#")
+            ipsec_command = input(f"CSR1KV(config)# ")
             if ipsec_command.lower() == 'exit':
                 break
             ipsec_commands.append(ipsec_command)
@@ -290,13 +290,13 @@ def configure_ipsec(ssh_conn):
         output = ssh_conn.send_config_set([ipsec_config])
 
         # Save the configuration
+        output += ssh_conn.send_command_timing('end')
         output += ssh_conn.send_command_timing('write memory')
         print(output)
 
         print("IPSec configuration complete")
     except ValueError as e:
         print(f"Error configuring IPSec: {e}")
-
 
 if __name__ == "__main__":
     ssh_menu()  # Call the ssh_menu() once
