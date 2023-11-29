@@ -211,6 +211,8 @@ def configure_acl(ssh_conn):
         command_shortcuts = {
             'enable': 'en',
             'configure terminal': ['configure terminal', 'conf t', 'config t'],
+            'exit': 'exit',
+            'interface': 'interface',
         }
 
         # Manually enter enable mode
@@ -229,21 +231,18 @@ def configure_acl(ssh_conn):
             print("Invalid command. Exiting ACL configuration.")
             return
 
-        prompt = ssh_conn.find_prompt()
-
         # Apply user-entered ACL configuration commands
-        acl_commands = []
+        acl_name = input("Enter ACL name: ")
+        acl_commands = [
+            f"ip access-list extended {acl_name}",
+        ]
+        
         while True:
-            acl_command = input(f"{prompt}")
+            acl_command = input(f"R1(config-ext-nacl)# ")
             if acl_command.lower() == 'exit':
                 break
 
             acl_commands.append(acl_command)
-
-            # Check if 'interface' command is entered
-            if acl_command.strip().lower().startswith('interface'):
-                # Manually set the prompt for config-if mode
-                prompt = "R1(config-if)#"
 
         # Join ACL commands into a single string
         acl_config = "\n".join(acl_commands)
