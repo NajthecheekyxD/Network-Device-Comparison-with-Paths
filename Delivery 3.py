@@ -258,9 +258,21 @@ def configure_acl(ssh_conn):
 def configure_ipsec(ssh_conn):
     print("Enter IPSec Configuration. Type 'exit' to finish.")
     try:
+        # Define command shortcuts
+        command_shortcuts = {
+            'enable': 'en',
+            'configure terminal': ['configure terminal', 'conf t', 'config t'],
+            'crypto isakmp policy': ['crypto isakmp policy', 'crypto isakmp pol'],
+            'hash': 'hash sha',
+            'authentication': 'authentication pre-share',
+            'group': 'group 24',
+            'lifetime': 'lifetime 3600',
+            'encryption': 'encryption aes 256',
+        }
+
         # Manually enter enable mode
         enable_command = input("R1>")
-        if enable_command.lower() in ['enable', 'en']:
+        if enable_command.lower() in command_shortcuts.get('enable', []):
             ssh_conn.send_command_timing('enable')
         else:
             print("Invalid command. Exiting IPSec configuration.")
@@ -268,29 +280,26 @@ def configure_ipsec(ssh_conn):
 
         # Manually enter configuration terminal mode
         config_command = input("R1#")
-        if config_command.lower() in ['configure terminal', 'conf t', 'config t']:
+        if config_command.lower() in command_shortcuts.get('configure terminal', []):
             ssh_conn.send_command_timing(config_command)
         else:
             print("Invalid command. Exiting IPSec configuration.")
             return
 
-        # Ensure that we are in global configuration mode
-        if not ssh_conn.check_config_mode():
-            ssh_conn.config_mode()
+        # Apply user-entered IPSec configuration commands
+        ipsec_commands = []
+        while True:
+            ipsec_command = input(f"{config_command}")
+            if ipsec_command.lower() == 'exit':
+                break
 
-        # Define a list of IPSec commands
-        ipsec_commands = [
-            'crypto isakmp policy 10',
-            'hash sha',
-            'authentication pre-share',
-            'group 24',
-            'lifetime 3600',
-            'encryption aes 256',
-            'exit',
-        ]
+            ipsec_commands.append(ipsec_command)
+
+        # Join IPSec commands into a single string
+        ipsec_config = "\n".join(ipsec_commands)
 
         # Use send_config_set to send the IPSec configuration
-        output = ssh_conn.send_config_set(ipsec_commands)
+        output = ssh_conn.send_config_set([ipsec_config])
 
         # Save the configuration
         output += ssh_conn.send_command_timing('write memory')
@@ -300,6 +309,19 @@ def configure_ipsec(ssh_conn):
     except ValueError as e:
         print(f"Error configuring IPSec: {e}")
 
+# Add 'crypto isakmp policy' to the list of IPSec commands
+ipsec_commands = [
+    'crypto isakmp policy 10',
+    'hash sha',
+    'authentication pre-share',
+    'group 24',
+    'lifetime 3600',
+    'encryption aes 256',
+]
+
+# Display the IPSec commands
+for command in ipsec_commands:
+    print(command)
 
 
 if __name__ == "__main__":
