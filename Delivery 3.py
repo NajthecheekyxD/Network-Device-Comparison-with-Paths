@@ -232,16 +232,13 @@ def configure_acl(ssh_conn):
             return
 
         # Apply user-entered ACL configuration commands
-        acl_commands = []
+        acl_commands = [
+            "ip access-list extended BLOCK_WEB",
+        ]
         while True:
-            acl_command = input(f"R1(config)# ")
+            acl_command = input(f"R1(config-ext-nacl)# ")
             if acl_command.lower() == 'exit':
                 break
-
-            if acl_command.lower().startswith('interface'):
-                print("Invalid command. Exiting ACL configuration.")
-                return
-
             acl_commands.append(acl_command)
 
         # Join ACL commands into a single string
@@ -257,6 +254,7 @@ def configure_acl(ssh_conn):
         print("ACL configuration complete")
     except ValueError as e:
         print(f"Error configuring ACL: {e}")
+
 
 def configure_ipsec(ssh_conn):
     print("Enter IPSec Configuration. Type 'exit' to finish.")
