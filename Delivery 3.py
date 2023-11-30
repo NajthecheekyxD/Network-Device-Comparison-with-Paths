@@ -313,8 +313,6 @@ def configure_ipsec(ssh_conn):
             print("Invalid command. Exiting IPSec configuration.")
             return
 
-        prompt = ssh_conn.find_prompt()
-
         # IPSec commands
         ipsec_commands = [
             'crypto isakmp policy 10',
