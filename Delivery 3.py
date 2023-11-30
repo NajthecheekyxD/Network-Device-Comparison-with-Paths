@@ -211,7 +211,6 @@ def configure_syslog(ssh_conn):
             print("Invalid command. Exiting Syslog configuration.")
             return
 
-       
         prompt = ssh_conn.find_prompt()
 
         # Syslog commands (modify as needed)
@@ -225,16 +224,17 @@ def configure_syslog(ssh_conn):
             user_input = input(f"{prompt} {syslog_command}")
             ssh_conn.send_command_timing(user_input)
 
-        # Use send_config_set to send the Syslog configuration
-        output = ssh_conn.send_config_set(command_shortcuts['exit_config'])
+        # Use send_config_set to send the exit command
+        ssh_conn.send_config_set(command_shortcuts['exit_config'])
 
         # Save the configuration
-        output += ssh_conn.send_command_timing('write memory')
+        output = ssh_conn.send_command_timing('write memory')
         print(output)
 
         print("Syslog configuration complete")
     except ValueError as e:
         print(f"Error configuring Syslog: {e}")
+
 
 def configure_acl(ssh_conn):
     print("Enter ACL Configuration. Type 'exit' to finish.")
