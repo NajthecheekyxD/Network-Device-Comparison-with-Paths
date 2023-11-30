@@ -325,11 +325,8 @@ def configure_ipsec(ssh_conn):
         ]
 
         # Apply predefined IPSec configuration commands
-        for cmd in ipsec_commands:
-            print(f"Sending command: {cmd}")
-            output = ssh_conn.send_command_timing(cmd)
-            print(output)
-            time.sleep(1)  # Add a short delay between commands
+        output = ssh_conn.send_config_set(ipsec_commands)
+        print(output)
 
         # Save the configuration
         output = ssh_conn.send_command_timing('write memory')
