@@ -186,7 +186,7 @@ def compare_with_hardening_device(show_running_config):
 
 
 def configure_syslog(ssh_conn):
-    print("Enter Syslog Configuration.")
+    print("Enter Syslog Configuration. Type 'exit' to finish.")
     try:
         # Define command shortcuts
         command_shortcuts = {
@@ -211,17 +211,19 @@ def configure_syslog(ssh_conn):
             print("Invalid command. Exiting Syslog configuration.")
             return
 
+       
         prompt = ssh_conn.find_prompt()
 
-        # Syslog commands
+        # Syslog commands (modify as needed)
         syslog_commands = [
             "logging buffered 8192",  # Example syslog command
-            "logging host 192.168.1.1",  # Example syslog host configuration
+            # Add other syslog commands here
         ]
 
         # Apply predefined Syslog configuration commands
         for syslog_command in syslog_commands:
-            ssh_conn.send_config_set([syslog_command])
+            user_input = input(f"{prompt} {syslog_command}")
+            ssh_conn.send_command_timing(user_input)
 
         # Use send_config_set to send the Syslog configuration
         output = ssh_conn.send_config_set(command_shortcuts['exit_config'])
