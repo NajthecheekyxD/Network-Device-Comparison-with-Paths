@@ -212,10 +212,10 @@ def configure_syslog(ssh_conn):
 
         prompt = ssh_conn.find_prompt()
 
-        # Syslog commands
+        # Syslog commands (modify as needed)
         syslog_commands = [
             "logging buffered 8192",  # Example syslog command
-            "logging host 192.168.1.1",  # Example syslog host configuration
+            # Add other syslog commands here
         ]
 
         # Apply predefined Syslog configuration commands
