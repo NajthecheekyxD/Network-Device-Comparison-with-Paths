@@ -288,32 +288,15 @@ def configure_acl(ssh_conn):
         print(f"Error configuring ACL: {e}")
 
 def configure_ipsec(ssh_conn):
-    print("Enter IPSec Configuration.")
+    print("Enter IPSec Configuration. Type 'exit' to finish.")
     try:
-        # Define command shortcuts
-        command_shortcuts = {
-            'enable': 'en',
-            'configure terminal': ['configure terminal', 'conf t', 'config t'],
-            'exit_config': ['exit', 'end'],
-        }
-
         # Manually enter enable mode
-        enable_command = input("R1>")
-        if enable_command.lower() in command_shortcuts.get('enable', []):
-            ssh_conn.send_command_timing('enable')
-        else:
-            print("Invalid command. Exiting IPSec configuration.")
-            return
+        ssh_conn.send_command_timing('enable')
 
         # Manually enter configuration terminal mode
-        config_command = input("R1#")
-        if config_command.lower() in command_shortcuts.get('configure terminal', []):
-            ssh_conn.send_command_timing(config_command)
-        else:
-            print("Invalid command. Exiting IPSec configuration.")
-            return
+        ssh_conn.send_command_timing('configure terminal')
 
-        # IPSec commands
+        # Apply predefined IPSec configuration commands
         ipsec_commands = [
             'crypto isakmp policy 10',
             'hash sha',
@@ -324,19 +307,16 @@ def configure_ipsec(ssh_conn):
             'exit',
         ]
 
-        # Apply predefined IPSec configuration commands
+        # Use send_config_set to send the IPSec configuration
         output = ssh_conn.send_config_set(ipsec_commands)
-        print(output)
 
         # Save the configuration
-        output = ssh_conn.send_command_timing('write memory')
+        output += ssh_conn.send_command_timing('write memory')
         print(output)
 
         print("IPSec configuration complete")
     except ValueError as e:
         print(f"Error configuring IPSec: {e}")
-
-
 
 
 if __name__ == "__main__":
