@@ -184,8 +184,9 @@ def compare_with_hardening_device(show_running_config):
     print('-' * 50)
     print('\n'.join(diff))
 
+
 def configure_syslog(ssh_conn):
-    print("Enter Syslog Configuration. Type 'exit' to finish.")
+    print("Enter Syslog Configuration.")
     try:
         # Define command shortcuts
         command_shortcuts = {
@@ -212,10 +213,10 @@ def configure_syslog(ssh_conn):
 
         prompt = ssh_conn.find_prompt()
 
-        # Syslog commands (modify as needed)
+        # Syslog commands
         syslog_commands = [
             "logging buffered 8192",  # Example syslog command
-            # Add other syslog commands here
+            "logging host 192.168.1.1",  # Example syslog host configuration
         ]
 
         # Apply predefined Syslog configuration commands
@@ -285,15 +286,34 @@ def configure_acl(ssh_conn):
         print(f"Error configuring ACL: {e}")
 
 def configure_ipsec(ssh_conn):
-    print("Enter IPSec Configuration. Type 'exit' to finish.")
+    print("Enter IPSec Configuration.")
     try:
+        # Define command shortcuts
+        command_shortcuts = {
+            'enable': 'en',
+            'configure terminal': ['configure terminal', 'conf t', 'config t'],
+            'exit_config': ['exit', 'end'],
+        }
+
         # Manually enter enable mode
-        ssh_conn.send_command_timing('enable')
+        enable_command = input("R1>")
+        if enable_command.lower() in command_shortcuts.get('enable', []):
+            ssh_conn.send_command_timing('enable')
+        else:
+            print("Invalid command. Exiting IPSec configuration.")
+            return
 
         # Manually enter configuration terminal mode
-        ssh_conn.send_command_timing('configure terminal')
+        config_command = input("R1#")
+        if config_command.lower() in command_shortcuts.get('configure terminal', []):
+            ssh_conn.send_command_timing(config_command)
+        else:
+            print("Invalid command. Exiting IPSec configuration.")
+            return
 
-        # Apply predefined IPSec configuration commands
+        prompt = ssh_conn.find_prompt()
+
+        # IPSec commands
         ipsec_commands = [
             'crypto isakmp policy 10',
             'hash sha',
@@ -304,16 +324,17 @@ def configure_ipsec(ssh_conn):
             'exit',
         ]
 
-        # Use send_config_set to send the IPSec configuration
-        output = ssh_conn.send_config_set(ipsec_commands)
+        # Apply predefined IPSec configuration commands
+        ssh_conn.send_config_set(ipsec_commands)
 
         # Save the configuration
-        output += ssh_conn.send_command_timing('write memory')
+        output = ssh_conn.send_command_timing('write memory')
         print(output)
 
         print("IPSec configuration complete")
     except ValueError as e:
         print(f"Error configuring IPSec: {e}")
+
 
 if __name__ == "__main__":
     ssh_menu()  # Call the ssh_menu() once
